@@ -13,6 +13,10 @@ class Puzzle
             to_monkey_if_false = l5.match(/If false: throw to monkey (\d+)/)[1].to_i
             @monkeys[id] = Monkey.new(id, items, operation, divisible_by, to_monkey_if_true, to_monkey_if_false)
         }
+        lcm = @monkeys.map(&:test_divisible_by).reduce(1, :lcm)
+        @monkeys.each do |monkey|
+            monkey.monkey_group_divisible_by_lcm = lcm
+        end
     end
 
     def run_turn_for_monkey(monkey,with_relieving=true)
@@ -35,10 +39,6 @@ class Puzzle
     end
 
     def solve_part2
-        lcm = @monkeys.map(&:test_divisible_by).reduce(1, :lcm)
-        @monkeys.each do |monkey|
-            monkey.monkey_group_divisible_by_lcm = lcm
-        end
         10000.times do
             run_round false
         end
@@ -69,12 +69,8 @@ class Monkey
             @inspected_items_count += 1
             worry_level = apply_operation
             worry_level = (worry_level/3).floor if with_relieving
-            remain = worry_level % test_divisible_by
-            unless with_relieving
-                worry_level = worry_level % monkey_group_divisible_by_lcm
-                worry_level = monkey_group_divisible_by_lcm if worry_level == 0
-            end
-            if(remain == 0)
+            worry_level = worry_level % monkey_group_divisible_by_lcm
+            if((worry_level % test_divisible_by) == 0)
                 [to_monkey_if_true, worry_level]
             else
                 [to_monkey_if_false, worry_level]
