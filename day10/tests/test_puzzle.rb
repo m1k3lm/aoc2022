@@ -35,8 +35,6 @@ class TestPuzzle < Test::Unit::TestCase
             "######......######......######......####",
             "#######.......#######.......#######.....",
         ]
-
-        ret = d.solve_part2.map{ |row| row.join("") } 
-        assert_equal result, ret
+        assert_equal result.join("\n"), d.solve_part2
     end
 end
